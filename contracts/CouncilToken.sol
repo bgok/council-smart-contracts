@@ -17,6 +17,10 @@ contract CouncilToken is ERC20, ERC20Permit, ERC20Votes {
         _mint(address(councilContract), 1_000_000);
     }
 
+    function decimals() public view virtual override returns (uint8) {
+        return 0;
+    }
+
     // The functions below are overrides required by Solidity.
 
     function _afterTokenTransfer(address from, address to, uint256 amount)
