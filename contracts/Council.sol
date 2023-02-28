@@ -7,8 +7,18 @@ import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorCounti
 import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Council is Initializable, GovernorUpgradeable, GovernorSettingsUpgradeable, GovernorCountingSimpleUpgradeable, GovernorVotesUpgradeable, GovernorVotesQuorumFractionUpgradeable {
+contract Council is
+    Initializable,
+    GovernorUpgradeable,
+    GovernorSettingsUpgradeable,
+    GovernorCountingSimpleUpgradeable,
+    GovernorVotesUpgradeable,
+    GovernorVotesQuorumFractionUpgradeable
+{
+    bool private _foundersGrantCompleted;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -20,6 +30,16 @@ contract Council is Initializable, GovernorUpgradeable, GovernorSettingsUpgradea
         __GovernorCountingSimple_init();
         __GovernorVotes_init(_token);
         __GovernorVotesQuorumFraction_init(4);
+        _foundersGrantCompleted = false;
+    }
+
+    function grantToFounders(address[] memory foundingMembers, uint256 grantQuantity) public {
+        require(!_foundersGrantCompleted, "Founder grant already completed");
+        _foundersGrantCompleted = true;
+        // Initial token distribution
+        for (uint i = 0; i < foundingMembers.length; i++) {
+            IERC20(address(token)).transfer(foundingMembers[i], grantQuantity);
+        }
     }
 
     // The following functions are overrides required by Solidity.

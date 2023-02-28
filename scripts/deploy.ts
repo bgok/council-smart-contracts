@@ -19,7 +19,10 @@ async function main(): Promise<void> {
   const councilContract = await upgrades.deployProxy(Council, [tokenContract.address]);
   await councilContract.deployed()
 
-  await tokenContract.initialize(councilContract.address);
+  const tx = await tokenContract.initialize(councilContract.address);
+  await tx.wait()
+
+  await councilContract.grantToFounders(['0x7Cf28824e6a73ec78fF83A2BC24a89cC5026C6B2'], 1000)
 
   console.log('CouncilToken deployed to:', tokenContract.address);
   console.log('CouncilContract deployed to:', councilContract.address)
