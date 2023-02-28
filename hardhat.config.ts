@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 import "@nomicfoundation/hardhat-toolbox";
+import '@openzeppelin/hardhat-upgrades';
 
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
@@ -20,6 +21,11 @@ const MNEMONIC = process.env.MNEMONIC || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
+const PRIVATE_KEY1 = process.env.PRIVATE_KEY1 || "";
+const PRIVATE_KEY2 = process.env.PRIVATE_KEY2 || "";
+const PRIVATE_KEY3 = process.env.PRIVATE_KEY3 || "";
+const PRIVATE_KEY4 = process.env.PRIVATE_KEY4 || "";
+const PRIVATE_KEY5 = process.env.PRIVATE_KEY5 || "";
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;
@@ -47,16 +53,26 @@ const config: HardhatUserConfig = {
       },
       chainId: chainIds.hardhat,
     },
-    mainnet: createTestnetConfig("mainnet"),
-    goerli: createTestnetConfig("goerli"),
-    kovan: createTestnetConfig("kovan"),
-    rinkeby: createTestnetConfig("rinkeby"),
-    ropsten: createTestnetConfig("ropsten"),
+    goerli: {
+      url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [PRIVATE_KEY1]
+    }
+    // mainnet: createTestnetConfig("mainnet"),
+    // goerli: createTestnetConfig("goerli"),
+    // kovan: createTestnetConfig("kovan"),
+    // rinkeby: createTestnetConfig("rinkeby"),
+    // ropsten: createTestnetConfig("ropsten"),
   },
   solidity: {
     compilers: [
       {
         version: "0.8.17",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       },
     ],
   },

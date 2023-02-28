@@ -1,69 +1,7 @@
-# Solidity Template
+# CouncilDAO
 
-This is a basic hardhat template to get you started writing and compiling contract.
-The template is configured with some sensible defaults but tries to stay minimal.
-It comes with most sensible plugins already installed via the suggested `hardhat-toolbox`.
+## Deployments
 
-- [Hardhat](https://github.com/nomiclabs/hardhat): compile and run the smart contracts on a local development network
-- [TypeChain](https://github.com/ethereum-ts/TypeChain): generate TypeScript types for smart contracts
-- [Ethers](https://github.com/ethers-io/ethers.js/): renowned Ethereum library and wallet implementation
-
-Use the template by clicking the "Use this template" button at the top of the page.
-
-## Usage
-
-### Pre Requisites
-
-Before running any command, make sure to install dependencies:
-
-```sh
-yarn install
-```
-
-### Compile
-
-Compile the smart contracts with Hardhat:
-
-```sh
-yarn compile
-```
-
-### Test
-
-Run the tests:
-
-```sh
-yarn test
-```
-
-#### Test gas costs
-
-To get a report of gas costs, set env `REPORT_GAS` to true
-
-To take a snapshot of the contract's gas costs
-
-```sh
-yarn test:gas
-```
-
-### Deploy contract to network (requires Mnemonic and Infura API key)
-
-```
-npx hardhat run --network goerli ./scripts/deploy.ts
-```
-
-### Validate a contract with etherscan (requires API key)
-
-```
-npx hardhat verify --network <network> <DEPLOYED_CONTRACT_ADDRESS> "Constructor argument 1"
-```
-
-## Thanks
-
-If you like it than you shoulda put a start ⭐ on it
-
-Twitter: [@amanusk\_](https://twitter.com/amanusk_)
-
-## License
-
-MIT
+| Network | CouncilToken                               | Council Proxy                           | Council Implementation |
+|---------|--------------------------------------------|--------------------------------------------|---|
+| Goerli  | 0x4A8Bc36FFc63207A0AB7f25a0572bb10Fd5C0E22 | 0x033CbC849a77Deb47C9285DEf797C470f4d49FFA | ?? |

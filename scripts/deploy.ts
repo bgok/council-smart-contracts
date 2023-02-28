@@ -2,7 +2,7 @@
 // but useful for running the script in a standalone fashion through `node <script>`.
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from "hardhat";
 import { Contract, ContractFactory } from 'ethers';
 
 async function main(): Promise<void> {
@@ -11,12 +11,18 @@ async function main(): Promise<void> {
   // to make sure everything is compiled
   // await run("compile");
   // We get the contract to deploy
-  const TestTokenFactory: ContractFactory = await ethers.getContractFactory(
-    'TestToken',
-  );
-  const testToken: Contract = await TestTokenFactory.deploy();
-  await testToken.deployed();
-  console.log('TestToken deployed to: ', testToken.address);
+
+  const tokenFactory = await ethers.getContractFactory("CouncilToken");
+  const tokenContract = await tokenFactory.deploy();
+
+  const Council = await ethers.getContractFactory("Council");
+  const councilContract = await upgrades.deployProxy(Council, [tokenContract.address]);
+  await councilContract.deployed()
+
+  await tokenContract.initialize(councilContract.address);
+
+  console.log('CouncilToken deployed to:', tokenContract.address);
+  console.log('CouncilContract deployed to:', councilContract.address)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
