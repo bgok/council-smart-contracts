@@ -37,11 +37,11 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
     keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     struct ProposalCore {
-        ProposalState state;
         TimersUpgradeable.BlockNumber voteStart;
         TimersUpgradeable.BlockNumber voteEnd;
         bool executed;
         bool canceled;
+        ProposalState state;
     }
 
     string private _name;

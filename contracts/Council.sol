@@ -20,7 +20,7 @@ contract Council is
     bool private _foundersGrantCompleted;
 
     modifier onlyVoter() {
-        require(token.balanceOf(_msgSender()) != 0, 'Voters only');
+        require(getVotes(_msgSender(), block.number - 1) >= 0, 'Voters only');
         _;
     }
 
@@ -90,6 +90,7 @@ contract Council is
     }
 
     function secondProposal(uint256 proposalId) onlyVoter public {
+        // TODO the proposer should not be able to second the proposal
         ProposalCore memory proposal = getProposalById(proposalId);
 
         require(proposal.state == ProposalState.SecondRequired);

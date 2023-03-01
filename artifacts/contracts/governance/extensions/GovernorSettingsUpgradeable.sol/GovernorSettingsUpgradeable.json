@@ -506,11 +506,6 @@
         {
           "components": [
             {
-              "internalType": "enum IGovernorUpgradeable.ProposalState",
-              "name": "state",
-              "type": "uint8"
-            },
-            {
               "components": [
                 {
                   "internalType": "uint64",
@@ -543,6 +538,11 @@
               "internalType": "bool",
               "name": "canceled",
               "type": "bool"
+            },
+            {
+              "internalType": "enum IGovernorUpgradeable.ProposalState",
+              "name": "state",
+              "type": "uint8"
             }
           ],
           "internalType": "struct GovernorUpgradeable.ProposalCore",
