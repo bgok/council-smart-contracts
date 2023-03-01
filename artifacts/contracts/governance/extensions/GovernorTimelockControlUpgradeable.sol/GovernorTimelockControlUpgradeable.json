@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "GovernorVotesQuorumFractionUpgradeable",
-  "sourceName": "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol",
+  "contractName": "GovernorTimelockControlUpgradeable",
+  "sourceName": "contracts/governance/extensions/GovernorTimelockControlUpgradeable.sol",
   "abi": [
     {
       "inputs": [],
@@ -114,17 +114,36 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "oldQuorumNumerator",
+          "name": "proposalId",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "newQuorumNumerator",
+          "name": "eta",
           "type": "uint256"
         }
       ],
-      "name": "QuorumNumeratorUpdated",
+      "name": "ProposalQueued",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "oldTimelock",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newTimelock",
+          "type": "address"
+        }
+      ],
+      "name": "TimelockChange",
       "type": "event"
     },
     {
@@ -458,6 +477,66 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getProposalById",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "enum IGovernorUpgradeable.ProposalState",
+              "name": "state",
+              "type": "uint8"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint64",
+                  "name": "_deadline",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct TimersUpgradeable.BlockNumber",
+              "name": "voteStart",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint64",
+                  "name": "_deadline",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct TimersUpgradeable.BlockNumber",
+              "name": "voteEnd",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bool",
+              "name": "executed",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "canceled",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct GovernorUpgradeable.ProposalCore",
+          "name": "proposal",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "account",
           "type": "address"
@@ -718,6 +797,25 @@
           "type": "uint256"
         }
       ],
+      "name": "proposalEta",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        }
+      ],
       "name": "proposalSnapshot",
       "outputs": [
         {
@@ -779,12 +877,27 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "blockNumber",
-          "type": "uint256"
+          "internalType": "address[]",
+          "name": "targets",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "values",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "calldatas",
+          "type": "bytes[]"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "descriptionHash",
+          "type": "bytes32"
         }
       ],
-      "name": "quorum",
+      "name": "queue",
       "outputs": [
         {
           "internalType": "uint256",
@@ -792,20 +905,7 @@
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "quorumDenominator",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -816,20 +916,7 @@
           "type": "uint256"
         }
       ],
-      "name": "quorumNumerator",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "quorumNumerator",
+      "name": "quorum",
       "outputs": [
         {
           "internalType": "uint256",
@@ -903,10 +990,10 @@
     },
     {
       "inputs": [],
-      "name": "token",
+      "name": "timelock",
       "outputs": [
         {
-          "internalType": "contract IVotesUpgradeable",
+          "internalType": "address",
           "name": "",
           "type": "address"
         }
@@ -917,12 +1004,12 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "newQuorumNumerator",
-          "type": "uint256"
+          "internalType": "contract TimelockControllerUpgradeable",
+          "name": "newTimelock",
+          "type": "address"
         }
       ],
-      "name": "updateQuorumNumerator",
+      "name": "updateTimelock",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

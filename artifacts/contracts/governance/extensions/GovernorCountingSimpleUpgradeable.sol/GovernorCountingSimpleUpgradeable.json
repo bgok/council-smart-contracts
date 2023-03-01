@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "GovernorCountingSimpleUpgradeable",
-  "sourceName": "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorCountingSimpleUpgradeable.sol",
+  "sourceName": "contracts/governance/extensions/GovernorCountingSimpleUpgradeable.sol",
   "abi": [
     {
       "inputs": [],
@@ -434,6 +434,66 @@
         }
       ],
       "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getProposalById",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "enum IGovernorUpgradeable.ProposalState",
+              "name": "state",
+              "type": "uint8"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint64",
+                  "name": "_deadline",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct TimersUpgradeable.BlockNumber",
+              "name": "voteStart",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint64",
+                  "name": "_deadline",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct TimersUpgradeable.BlockNumber",
+              "name": "voteEnd",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bool",
+              "name": "executed",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "canceled",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct GovernorUpgradeable.ProposalCore",
+          "name": "proposal",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {

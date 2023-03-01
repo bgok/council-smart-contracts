@@ -37,6 +37,7 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
     keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     struct ProposalCore {
+        ProposalState state;
         TimersUpgradeable.BlockNumber voteStart;
         TimersUpgradeable.BlockNumber voteEnd;
         bool executed;
@@ -123,6 +124,11 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         return "1";
     }
 
+    function _setState(uint256 proposalId, ProposalState state_) internal {
+        ProposalCore storage proposal = _proposals[proposalId];
+        proposal.state = state_;
+    }
+
     /**
      * @dev See {IGovernor-hashProposal}.
      *
@@ -143,6 +149,10 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         bytes32 descriptionHash
     ) public pure virtual override returns (uint256) {
         return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash)));
+    }
+
+    function getProposalById(uint256 proposalId) public view returns (ProposalCore memory proposal) {
+        proposal = _proposals[proposalId];
     }
 
     /**
@@ -266,13 +276,9 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         require(targets.length > 0, "Governor: empty proposal");
 
         ProposalCore storage proposal = _proposals[proposalId];
-        require(proposal.voteStart.isUnset(), "Governor: proposal already exists");
+        require(proposal.state != ProposalState.Unset, "Governor: proposal already exists");
 
-        uint64 snapshot = block.number.toUint64() + votingDelay().toUint64();
-        uint64 deadline = snapshot + votingPeriod().toUint64();
-
-        proposal.voteStart.setDeadline(snapshot);
-        proposal.voteEnd.setDeadline(deadline);
+        _postProposalAction(proposal);
 
         emit ProposalCreated(
             proposalId,
@@ -281,12 +287,20 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
             values,
             new string[](targets.length),
             calldatas,
-            snapshot,
-            deadline,
+            proposal.voteStart.getDeadline(),
+            proposal.voteEnd.getDeadline(),
             description
         );
 
         return proposalId;
+    }
+
+    function _postProposalAction(ProposalCore storage proposal) internal virtual {
+        uint64 snapshot = block.number.toUint64() + votingDelay().toUint64();
+        uint64 deadline = snapshot + votingPeriod().toUint64();
+
+        proposal.voteStart.setDeadline(snapshot);
+        proposal.voteEnd.setDeadline(deadline);
     }
 
     /**

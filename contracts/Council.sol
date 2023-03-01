@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts-upgradeable/governance/GovernorUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorSettingsUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorCountingSimpleUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
+import "./governance/GovernorUpgradeable.sol";
+import "./governance/extensions/GovernorSettingsUpgradable.sol";
+import "./governance/extensions/GovernorCountingSimpleUpgradeable.sol";
+import "./governance/extensions/GovernorVotesUpgradeable.sol";
+import "./governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -18,6 +18,11 @@ contract Council is
     GovernorVotesQuorumFractionUpgradeable
 {
     bool private _foundersGrantCompleted;
+
+    modifier onlyVoter() {
+        require(token.balanceOf(_msgSender()) != 0, 'Voters only');
+        _;
+    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -78,5 +83,17 @@ contract Council is
     returns (uint256)
     {
         return super.proposalThreshold();
+    }
+
+    function _postProposalAction(ProposalCore storage proposal) internal override(GovernorUpgradeable) {
+        proposal.state = ProposalState.SecondRequired;
+    }
+
+    function secondProposal(uint256 proposalId) onlyVoter public {
+        ProposalCore memory proposal = getProposalById(proposalId);
+
+        require(proposal.state == ProposalState.SecondRequired);
+
+        _setState(proposalId, ProposalState.InDiscussion);
     }
 }

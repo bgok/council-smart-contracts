@@ -2,6 +2,7 @@
 // OpenZeppelin Contracts (last updated v4.5.0) (governance/utils/IVotes.sol)
 pragma solidity ^0.8.0;
 
+
 /**
  * @dev Common interface for {ERC20Votes}, {ERC721Votes}, and other {Votes}-enabled contracts.
  *
@@ -17,6 +18,8 @@ interface IVotesUpgradeable {
      * @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of votes.
      */
     event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
+
+    function balanceOf(address account) external view returns (uint256);
 
     /**
      * @dev Returns the current amount of votes that `account` has.

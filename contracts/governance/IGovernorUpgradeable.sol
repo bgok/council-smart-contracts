@@ -18,6 +18,9 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
     function __IGovernor_init_unchained() internal onlyInitializing {
     }
     enum ProposalState {
+        Unset,
+        SecondRequired,
+        InDiscussion,
         Pending,
         Active,
         Canceled,
