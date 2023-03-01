@@ -10,7 +10,9 @@
     "clean": "rm -rf ./artifacts ./cache ./typechain ",
     "deploy": "yarn clean && yarn compile && npx hardhat run scripts/deploy.ts",
     "deploy:goerli": "yarn clean && yarn compile && npx hardhat run scripts/deploy.ts --network goerli",
-    "update:goerli": "yarn clean && yarn compile && npx hardhat run scripts/update.ts --network goerli"
+    "deploy:hyperspace": "yarn clean && yarn compile && npx hardhat run scripts/deploy.ts --network hyperspace",
+    "update:goerli": "yarn clean && yarn compile && npx hardhat run scripts/update.ts --network goerli",
+    "update:hyperspace": "yarn clean && yarn compile && npx hardhat run scripts/update.ts --network hyperspace"
   },
   "author": "amanusk",
   "license": "MIT",

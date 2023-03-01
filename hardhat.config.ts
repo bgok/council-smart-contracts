@@ -56,7 +56,12 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [PRIVATE_KEY1]
-    }
+    },
+    hyperspace: {
+      chainId: 3141,
+      url: "https://api.hyperspace.node.glif.io/rpc/v1",
+      accounts: [PRIVATE_KEY1],
+    },
     // mainnet: createTestnetConfig("mainnet"),
     // goerli: createTestnetConfig("goerli"),
     // kovan: createTestnetConfig("kovan"),
