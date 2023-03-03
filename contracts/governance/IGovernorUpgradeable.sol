@@ -21,6 +21,7 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
         Unset,
         SecondRequired,
         InDiscussion,
+        DiscussionSuspended,
         Pending,
         Active,
         Canceled,
@@ -43,7 +44,8 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
         bytes[] calldatas,
         uint256 startBlock,
         uint256 endBlock,
-        string description
+        string description,
+        string cid
     );
 
     /**
@@ -207,7 +209,8 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        string memory description
+        string memory description,
+        string memory cid
     ) public virtual returns (uint256 proposalId);
 
     /**

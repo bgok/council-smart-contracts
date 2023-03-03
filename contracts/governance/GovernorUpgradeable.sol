@@ -16,7 +16,7 @@ import "@openzeppelin/contracts-upgradeable/utils/TimersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./IGovernorUpgradeable.sol";
 
-//import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Core of the governance system, designed to be extended though various modules.
@@ -44,6 +44,8 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         bool executed;
         bool canceled;
         ProposalState state;
+        uint256 parent;
+        string cid;
     }
 
     string private _name;
@@ -75,6 +77,13 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         }
         _;
     }
+
+    modifier onlyVoter() {
+        require(isVoter(_msgSender()), 'Voters only');
+        _;
+    }
+
+    function isVoter(address account) virtual internal returns (bool);
 
     /**
      * @dev Sets the value for {name} and {version}
@@ -264,8 +273,9 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        string memory description
-    ) public virtual override returns (uint256) {
+        string memory description,
+        string memory cid
+    ) public onlyVoter virtual override returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             "Governor: proposer votes below proposal threshold"
@@ -290,7 +300,8 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
             calldatas,
             proposal.voteStart.getDeadline(),
             proposal.voteEnd.getDeadline(),
-            description
+            description,
+            cid
         );
 
         return proposalId;

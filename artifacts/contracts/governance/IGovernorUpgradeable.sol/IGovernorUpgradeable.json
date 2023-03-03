@@ -85,6 +85,12 @@
           "internalType": "string",
           "name": "description",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "cid",
+          "type": "string"
         }
       ],
       "name": "ProposalCreated",
@@ -587,6 +593,11 @@
         {
           "internalType": "string",
           "name": "description",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "cid",
           "type": "string"
         }
       ],

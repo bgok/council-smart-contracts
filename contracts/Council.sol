@@ -8,6 +8,7 @@ import "./governance/extensions/GovernorVotesUpgradeable.sol";
 import "./governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./ICouncil.sol";
 
 contract Council is
     Initializable,
@@ -15,14 +16,21 @@ contract Council is
     GovernorSettingsUpgradeable,
     GovernorCountingSimpleUpgradeable,
     GovernorVotesUpgradeable,
-    GovernorVotesQuorumFractionUpgradeable
+    GovernorVotesQuorumFractionUpgradeable,
+    ICouncil
 {
     bool private _foundersGrantCompleted;
 
-    modifier onlyVoter() {
-        require(getVotes(_msgSender(), block.number - 1) >= 0, 'Voters only');
-        _;
+    struct Comment {
+        string cid;
+        uint256 parent;
+        uint256 proposal;
+        uint256 upvotes;
+        uint256 downvotes;
+        Sentiment sentiment;
     }
+
+    mapping(uint256 => Comment) private _comments;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -99,5 +107,25 @@ contract Council is
         emit ProposalSeconded(proposalId, _msgSender());
     }
 
-    event ProposalSeconded(uint256 proposalId, address seconder);
+    function isVoter(address account) virtual internal override returns (bool) {
+        return token.balanceOf(account) > 0;
+    }
+
+//    function commentHash(
+//        uint256 proposal,
+//        uint256 parent,
+//        string memory cid,
+//        Sentiment sentiment
+//    ) pure public returns (uint256 hash)
+//    {
+//        hash = uint256(keccak256(abi.encode(proposal, parent, cid, sentiment)));
+//    }
+
+//    function addComment(uint256 proposal, uint256 parent, string memory cid, Sentiment sentiment) onlyVoter public {
+//        // require parent exists or zero
+//        // require proposal state is InDiscussion
+//        uint256 commentId = commentHash(proposal, parent, cid, sentiment);
+//        Comment storage comment = _comments[commentId];
+////        require(comment.cid);
+//    }
 }
