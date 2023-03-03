@@ -16,6 +16,8 @@ import "@openzeppelin/contracts-upgradeable/utils/TimersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./IGovernorUpgradeable.sol";
 
+//import "hardhat/console.sol";
+
 /**
  * @dev Core of the governance system, designed to be extended though various modules.
  *
@@ -273,10 +275,9 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
 
         require(targets.length == values.length, "Governor: invalid proposal length");
         require(targets.length == calldatas.length, "Governor: invalid proposal length");
-        require(targets.length > 0, "Governor: empty proposal");
 
         ProposalCore storage proposal = _proposals[proposalId];
-        require(proposal.state != ProposalState.Unset, "Governor: proposal already exists");
+        require(proposal.state == ProposalState.Unset, "Governor: proposal already exists");
 
         _postProposalAction(proposal);
 

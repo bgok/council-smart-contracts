@@ -96,5 +96,8 @@ contract Council is
         require(proposal.state == ProposalState.SecondRequired);
 
         _setState(proposalId, ProposalState.InDiscussion);
+        emit ProposalSeconded(proposalId, _msgSender());
     }
+
+    event ProposalSeconded(uint256 proposalId, address seconder);
 }

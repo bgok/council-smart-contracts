@@ -13,5 +13,6 @@ yarn.lock
 typechain/*
 artifacts/build-info
 artifacts/**/*.dbg.json
-
-
+artifacts/hardhat
+yarn-error.log
+.openzeppelin
