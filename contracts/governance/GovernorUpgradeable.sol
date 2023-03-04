@@ -51,7 +51,7 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
     string private _name;
 
     // TODO make this enumerable
-    mapping(uint256 => ProposalCore) private _proposals;
+    mapping(uint256 => ProposalCore) public _proposals;
     uint256[] public proposalIds;
 
     // This queue keeps track of the governor operating on itself. Calls to functions protected by the
@@ -282,14 +282,14 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             "Governor: proposer votes below proposal threshold"
         );
-
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
-
         require(targets.length == values.length, "Governor: invalid proposal length");
         require(targets.length == calldatas.length, "Governor: invalid proposal length");
 
+        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
+
         ProposalCore storage proposal = _proposals[proposalId];
         require(proposal.state == ProposalState.Unset, "Governor: proposal already exists");
+        proposal.cid = cid;
 
         proposalIds.push(proposalId);
         _postProposalAction(proposal);

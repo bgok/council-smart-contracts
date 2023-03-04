@@ -81,8 +81,9 @@ describe("Token", () => {
       await expect(councilContract.connect(nonMember).secondProposal(proposalId))
         .to.be.rejectedWith('Voters only')
     })
+  })
 
-    xit('get a list of all proposals', async () => {
+  xit('get a list of all proposals', async () => {
       const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
       const proposalText = 'hello council'
       const cid = 'beefdead'
@@ -98,6 +99,7 @@ describe("Token", () => {
       console.log(proposals)
     })
 
+  describe('comments', async () => {
     it('add comment', async () => {
       const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
 
@@ -166,4 +168,49 @@ describe("Token", () => {
         .to.be.rejectedWith("unknown proposal or not in-discussion")
     })
   });
+  describe('amendment', async () => {
+    it('allows voters to propose an amendment', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      const proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      councilContract.connect(member2).secondProposal(proposalId)
+
+      const amendmentCid = "ammendment cid";
+      const amendmentDescription = "not too loud, tho"
+
+      const amendmentId = await councilContract.hashAmendment(
+        proposalId, [],[], [], amendmentDescription, amendmentCid
+      )
+
+      await expect(councilContract.connect(member2).proposeAmendment(
+        proposalId, [], [], [], amendmentDescription, amendmentCid
+      )).to.emit(councilContract, 'AmendmentCreated')
+        .withArgs(proposalId, amendmentId, member2.address, [], [], [], [], 0, 0, amendmentDescription, amendmentCid)
+
+      // Proposal state should be AmendmentPending
+      const proposal = await councilContract.getProposalById(proposalId)
+      expect(proposal.state).to.equal(3) // AmendmentPending
+
+      // Check that the amendment is set up correctly
+      const amendment = await councilContract.getProposalById(amendmentId)
+      expect(amendment.state).to.equal(1) // SecondRequired
+      expect(amendment.cid).to.equal(amendmentCid)
+
+      await councilContract.connect(member2).secondProposal(amendmentId)
+    })
+    it('rejects amendments to non-existing propopsals', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const amendmentCid = "ammendment cid";
+      const amendmentDescription = "not too loud, tho"
+
+      await expect(councilContract.connect(member2).proposeAmendment(
+        0, [], [], [], amendmentDescription, amendmentCid
+      )).to.rejectedWith("unknown proposal or not in-discussion")
+    })
+  })
 });

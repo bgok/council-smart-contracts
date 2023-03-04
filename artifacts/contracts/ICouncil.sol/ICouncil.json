@@ -14,6 +14,79 @@
         },
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "amendmentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "proposer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address[]",
+          "name": "targets",
+          "type": "address[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256[]",
+          "name": "values",
+          "type": "uint256[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "signatures",
+          "type": "string[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes[]",
+          "name": "calldatas",
+          "type": "bytes[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "cid",
+          "type": "string"
+        }
+      ],
+      "name": "AmendmentCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "address",
           "name": "commenter",
           "type": "address"
@@ -60,8 +133,8 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220c6ff8b12f226ab57733d16e3f64d98f2e280eabb48cabaff3dc8fbd404cd63ec64736f6c63430008110033",
-  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220c6ff8b12f226ab57733d16e3f64d98f2e280eabb48cabaff3dc8fbd404cd63ec64736f6c63430008110033",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212205522e054a24aa6601ba1a391e51d4de8237656c335651a5843a8203f831c530b64736f6c63430008110033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212205522e054a24aa6601ba1a391e51d4de8237656c335651a5843a8203f831c530b64736f6c63430008110033",
   "linkReferences": {},
   "deployedLinkReferences": {}
 }

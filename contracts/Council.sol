@@ -8,6 +8,7 @@ import "./governance/extensions/GovernorVotesUpgradeable.sol";
 import "./governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/utils/TimersUpgradeable.sol";
 import "./ICouncil.sol";
 
 contract Council is
@@ -136,5 +137,57 @@ contract Council is
         emit CommentEvent(
             proposalId, _msgSender(), parent, cid, sentiment
         );
+    }
+
+    function hashAmendment(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description,
+        string memory cid
+    ) public pure virtual returns (uint256) {
+        return uint256(keccak256(abi.encode(proposalId, targets, values, calldatas, description, cid)));
+    }
+
+    function proposeAmendment(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description,
+        string memory cid
+    ) public onlyVoter returns (uint256) {
+        require(targets.length == values.length, "Governor: invalid proposal length");
+        require(targets.length == calldatas.length, "Governor: invalid proposal length");
+
+        ProposalCore storage proposal = _proposals[proposalId];
+        require(proposal.state == ProposalState.InDiscussion, "unknown proposal or not in-discussion");
+
+        uint256 amendmentId = hashAmendment(proposalId, targets, values, calldatas, description, cid);
+
+        ProposalCore storage amendment = _proposals[amendmentId];
+        require(amendment.state == ProposalState.Unset, "amendment already exists");
+
+        amendment.state = ProposalState.SecondRequired;
+        amendment.cid = cid;
+
+        proposal.state = ProposalState.AmendmentPending;
+
+        emit AmendmentCreated(
+            proposalId,
+            amendmentId,
+            _msgSender(),
+            targets,
+            values,
+            new string[](targets.length),
+            calldatas,
+            0, //amendment.voteStart.getDeadline(),
+            0, //amendment.voteEnd.getDeadline(),
+            description,
+            cid
+        );
+
+        return amendmentId;
     }
 }

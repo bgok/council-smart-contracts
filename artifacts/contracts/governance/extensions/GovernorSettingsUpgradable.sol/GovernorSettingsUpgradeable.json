@@ -294,6 +294,69 @@
       "inputs": [
         {
           "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "_proposals",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint64",
+              "name": "_deadline",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct TimersUpgradeable.BlockNumber",
+          "name": "voteStart",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint64",
+              "name": "_deadline",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct TimersUpgradeable.BlockNumber",
+          "name": "voteEnd",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bool",
+          "name": "executed",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "canceled",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IGovernorUpgradeable.ProposalState",
+          "name": "state",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "parent",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "cid",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
           "name": "proposalId",
           "type": "uint256"
         },
