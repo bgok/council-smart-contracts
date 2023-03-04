@@ -23,14 +23,15 @@ contract Council is
 
     struct Comment {
         string cid;
-        uint256 parent;
+        uint256 parent; // Parent comment hash, 0 indicates it is a comment directly on the proposal
         uint256 proposal;
         uint256 upvotes;
         uint256 downvotes;
         Sentiment sentiment;
     }
 
-    mapping(uint256 => Comment) private _comments;
+    // TODO make this enumerable
+    mapping(uint256 => Comment) public comments;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -111,21 +112,29 @@ contract Council is
         return token.balanceOf(account) > 0;
     }
 
-//    function commentHash(
-//        uint256 proposal,
-//        uint256 parent,
-//        string memory cid,
-//        Sentiment sentiment
-//    ) pure public returns (uint256 hash)
-//    {
-//        hash = uint256(keccak256(abi.encode(proposal, parent, cid, sentiment)));
-//    }
+    function commentHash(
+        uint256 proposal,
+        uint256 parent,
+        string memory cid,
+        Sentiment sentiment
+    ) pure public returns (uint256 hash)
+    {
+        hash = uint256(keccak256(abi.encode(proposal, parent, cid, sentiment)));
+    }
 
-//    function addComment(uint256 proposal, uint256 parent, string memory cid, Sentiment sentiment) onlyVoter public {
-//        // require parent exists or zero
-//        // require proposal state is InDiscussion
-//        uint256 commentId = commentHash(proposal, parent, cid, sentiment);
-//        Comment storage comment = _comments[commentId];
-////        require(comment.cid);
-//    }
+    function addComment(uint256 proposalId, uint256 parent, string memory cid, Sentiment sentiment) onlyVoter public {
+        require(getProposalById(proposalId).state == ProposalState.InDiscussion, "unknown proposal or not in-discussion");
+        require(parent == 0 || bytes(comments[parent].cid).length != 0, "unknown parent");
+
+        uint256 commentId = commentHash(proposalId, parent, cid, sentiment);
+        Comment storage comment = comments[commentId];
+        comment.proposal = proposalId;
+        comment.parent = parent;
+        comment.cid = cid;
+        comment.sentiment = sentiment;
+
+        emit CommentEvent(
+            proposalId, _msgSender(), parent, cid, sentiment
+        );
+    }
 }

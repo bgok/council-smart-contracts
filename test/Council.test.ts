@@ -4,6 +4,7 @@ import { loadFixture, mine } from "@nomicfoundation/hardhat-network-helpers";
 import snapshotGasCost from "@uniswap/snapshot-gas-cost";
 import { keccak256 } from "hardhat/internal/util/keccak";
 import { utils } from "ethers";
+import { Council__factory } from "../typechain";
 
 describe("Token", () => {
   async function deployContracts() {
@@ -69,7 +70,7 @@ describe("Token", () => {
         .to.be.revertedWith('Voters only')
     })
 
-    it('rejects a second from a non-mmeber', async () => {
+    it('rejects a second from a non-member', async () => {
       const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
       const proposalText = 'hello council'
       const cid = 'beefdead'
@@ -79,6 +80,90 @@ describe("Token", () => {
 
       await expect(councilContract.connect(nonMember).secondProposal(proposalId))
         .to.be.rejectedWith('Voters only')
+    })
+
+    xit('get a list of all proposals', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+      const proposalText = 'hello council'
+      const cid = 'beefdead'
+
+      for (let i = 0; i <5; i++) {
+        await councilContract.connect(member1).propose([], [], [], `${proposalText}-${i}`, `${cid}${i}`)
+      }
+
+      // TODO Do this without an argument
+      const proposals = await councilContract.proposalIds(/* argument required */);
+
+      expect(proposals.length).to.equal(5);
+      console.log(proposals)
+    })
+
+    it('add comment', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      const proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      councilContract.connect(member2).secondProposal(proposalId)
+
+      const commentCid = "comment cid";
+      const parent = 0;
+      const sentiment = 4;
+      const commentId = await councilContract.commentHash(proposalId, parent,  commentCid, sentiment)
+
+      await expect(councilContract.connect(member2).addComment(proposalId, parent,  commentCid, sentiment))
+        .to.emit(councilContract, 'CommentEvent')
+        .withArgs(proposalId, member2.address, parent, commentCid, sentiment)
+
+      const comment = await councilContract.comments(commentId)
+      expect(comment.cid).to.equal(commentCid)
+      expect(comment.parent).to.equal(parent)
+      expect(comment.proposal).to.equal(proposalId)
+      expect(comment.upvotes).to.equal(0)
+      expect(comment.downvotes).to.equal(0)
+      expect(comment.sentiment).to.equal(sentiment)
+    })
+
+    it('reject unknown parent comment', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      const proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      councilContract.connect(member2).secondProposal(proposalId)
+
+      const commentCid = "comment cid";
+      const parent = 99;
+      const sentiment = 4;
+      const commentId = await councilContract.commentHash(proposalId, parent,  commentCid, sentiment)
+
+      await expect(councilContract.connect(member2).addComment(proposalId, parent,  commentCid, sentiment))
+        .to.be.rejectedWith("unknown parent")
+    })
+
+    it('reject comment for unknown proposal', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+
+      await expect(councilContract.connect(member2).addComment(0, 0, 'commentCID', 4))
+        .to.be.rejectedWith("unknown proposal or not in-discussion")
+    })
+    it('reject comment when not in-discussion', async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      const proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      await expect(councilContract.connect(member2).addComment(proposalId, 0, 'commentCID', 4))
+        .to.be.rejectedWith("unknown proposal or not in-discussion")
     })
   });
 });

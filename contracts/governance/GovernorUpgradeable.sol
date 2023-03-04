@@ -50,7 +50,9 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
 
     string private _name;
 
+    // TODO make this enumerable
     mapping(uint256 => ProposalCore) private _proposals;
+    uint256[] public proposalIds;
 
     // This queue keeps track of the governor operating on itself. Calls to functions protected by the
     // {onlyGovernance} modifier needs to be whitelisted in this queue. Whitelisting is set in {_beforeExecute},
@@ -289,6 +291,7 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         ProposalCore storage proposal = _proposals[proposalId];
         require(proposal.state == ProposalState.Unset, "Governor: proposal already exists");
 
+        proposalIds.push(proposalId);
         _postProposalAction(proposal);
 
         emit ProposalCreated(

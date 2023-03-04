@@ -15,6 +15,43 @@
         {
           "indexed": false,
           "internalType": "address",
+          "name": "commenter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "parent",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "cid",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum ICouncil.Sentiment",
+          "name": "sentiment",
+          "type": "uint8"
+        }
+      ],
+      "name": "CommentEvent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "seconder",
           "type": "address"
         }
@@ -23,8 +60,8 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122070fe752743ede46b7d822fc2b605c2e7999f78f16c5d1ac69a37f34113f8049c64736f6c63430008110033",
-  "deployedBytecode": "0x6080604052600080fdfea264697066735822122070fe752743ede46b7d822fc2b605c2e7999f78f16c5d1ac69a37f34113f8049c64736f6c63430008110033",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220c6ff8b12f226ab57733d16e3f64d98f2e280eabb48cabaff3dc8fbd404cd63ec64736f6c63430008110033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220c6ff8b12f226ab57733d16e3f64d98f2e280eabb48cabaff3dc8fbd404cd63ec64736f6c63430008110033",
   "linkReferences": {},
   "deployedLinkReferences": {}
 }
