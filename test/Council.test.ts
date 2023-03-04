@@ -5,6 +5,7 @@ import snapshotGasCost from "@uniswap/snapshot-gas-cost";
 import { keccak256 } from "hardhat/internal/util/keccak";
 import { utils } from "ethers";
 import { Council__factory } from "../typechain";
+import describe from "node:test";
 
 describe("Token", () => {
   async function deployContracts() {
@@ -211,6 +212,32 @@ describe("Token", () => {
       await expect(councilContract.connect(member2).proposeAmendment(
         0, [], [], [], amendmentDescription, amendmentCid
       )).to.rejectedWith("unknown proposal or not in-discussion")
+    })
+  })
+  describe("move to vote", async () => {
+    it("Allows voter to move to vote", async () => {
+      const { member1, member2, nonMember, tokenContract, councilContract } = await loadFixture(deployContracts);
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      const proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      councilContract.connect(member2).secondProposal(proposalId)
+
+      await expect(councilContract.connect(member2).moveToVote(proposalId))
+        .to.emit(councilContract, "MoveToVoteRequested")
+        .withArgs(proposalId, member2.address)
+
+      let proposalState = (await councilContract.getProposalById(proposalId)).state;
+      expect(proposalState).to.equal(4); // state should be MoveToVotePending
+
+      await expect(councilContract.connect(member1).secondProposal(proposalId))
+        .to.emit(councilContract, "ProposalSeconded")
+        .withArgs(proposalId, member1.address)
+
+      proposalState = (await councilContract.getProposalById(proposalId)).state;
+      expect(proposalState).to.equal(7); // state should be Active
     })
   })
 });

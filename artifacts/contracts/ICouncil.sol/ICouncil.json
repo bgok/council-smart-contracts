@@ -125,6 +125,25 @@
         {
           "indexed": false,
           "internalType": "address",
+          "name": "requestor",
+          "type": "address"
+        }
+      ],
+      "name": "MoveToVoteRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "seconder",
           "type": "address"
         }
@@ -133,8 +152,8 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212205522e054a24aa6601ba1a391e51d4de8237656c335651a5843a8203f831c530b64736f6c63430008110033",
-  "deployedBytecode": "0x6080604052600080fdfea26469706673582212205522e054a24aa6601ba1a391e51d4de8237656c335651a5843a8203f831c530b64736f6c63430008110033",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212207c14044320d4ac48ab660dec5988a918559ea85c3263d565ece4429b2fe49bec64736f6c63430008110033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212207c14044320d4ac48ab660dec5988a918559ea85c3263d565ece4429b2fe49bec64736f6c63430008110033",
   "linkReferences": {},
   "deployedLinkReferences": {}
 }

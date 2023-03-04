@@ -103,9 +103,13 @@ contract Council is
         // TODO the proposer should not be able to second the proposal
         ProposalCore memory proposal = getProposalById(proposalId);
 
-        require(proposal.state == ProposalState.SecondRequired);
+        require(proposal.state == ProposalState.SecondRequired || proposal.state == ProposalState.MoveToVotePending);
 
-        _setState(proposalId, ProposalState.InDiscussion);
+        if (proposal.state == ProposalState.SecondRequired) {
+            _setState(proposalId, ProposalState.InDiscussion);
+        } else if (proposal.state == ProposalState.MoveToVotePending) {
+            _setState(proposalId, ProposalState.Active);
+        }
         emit ProposalSeconded(proposalId, _msgSender());
     }
 
@@ -189,5 +193,12 @@ contract Council is
         );
 
         return amendmentId;
+    }
+
+    function moveToVote(uint256 proposalId) public onlyVoter {
+        ProposalCore storage proposal = _proposals[proposalId];
+        require(proposal.state == ProposalState.InDiscussion, 'must be in discussion');
+        proposal.state = ProposalState.MoveToVotePending;
+        emit MoveToVoteRequested(proposalId, _msgSender());
     }
 }

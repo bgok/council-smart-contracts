@@ -25,5 +25,5 @@ contract ICouncil {
         string description,
         string cid
     );
-
+    event MoveToVoteRequested(uint256 proposalId, address requestor);
 }

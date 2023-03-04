@@ -22,6 +22,7 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
         SecondRequired,
         InDiscussion,
         AmendmentPending,
+        MoveToVotePending,
         DiscussionSuspended,
         Pending,
         Active,
