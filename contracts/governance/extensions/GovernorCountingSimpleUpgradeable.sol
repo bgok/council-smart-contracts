@@ -6,6 +6,8 @@ pragma solidity ^0.8.0;
 import "../GovernorUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+//import "hardhat/console.sol";
+
 /**
  * @dev Extension of {Governor} for simple, 3 options, vote counting.
  *
@@ -72,6 +74,13 @@ abstract contract GovernorCountingSimpleUpgradeable is Initializable, GovernorUp
      */
     function _quorumReached(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalVote storage proposalVote = _proposalVotes[proposalId];
+
+//        console.log(proposalVote.forVotes);
+//        console.log(proposalVote.againstVotes);
+//        console.log(proposalVote.abstainVotes);
+
+//        console.log(proposalSnapshot(proposalId));
+//        console.log(quorum(proposalSnapshot(proposalId)));
 
         return quorum(proposalSnapshot(proposalId)) <= proposalVote.forVotes + proposalVote.abstainVotes;
     }

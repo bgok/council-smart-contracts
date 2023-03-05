@@ -18,10 +18,12 @@ describe("Token", () => {
     const councilContract = await upgrades.deployProxy(Council, [tokenContract.address]);
     await councilContract.deployed()
 
-    const tx = await tokenContract.initialize(councilContract.address);
+    const tx = await tokenContract.initialize(councilContract.address, 50);
     await tx.wait()
 
     await councilContract.grantToFounders([member1.address, member2.address], 1)
+    await tokenContract.connect(member1).delegate(member1.address) // You must delegate to yourself
+    await tokenContract.connect(member2).delegate(member2.address)
 
     console.log('CouncilToken deployed to:', tokenContract.address);
     console.log('CouncilContract deployed to:', councilContract.address)
@@ -244,7 +246,7 @@ describe("Token", () => {
       expect(await councilContract.proposalDeadline(proposalId)).to.not.equal(0);
     })
   })
-  xdescribe("vote on proposal", async () => {
+  describe("vote on proposal", async () => {
     let proposalId:any, member1:any, member2:any, nonMember:any, tokenContract:any, councilContract:any
     beforeEach(async () => {
       const result  = await loadFixture(deployContracts);
@@ -263,17 +265,35 @@ describe("Token", () => {
       await councilContract.connect(member2).moveToVote(proposalId)
       await councilContract.connect(member1).secondProposal(proposalId)
     })
-    it("should accept and count votes", async () => {
+    it("should accept, count votes, and mark proposal SUCCEEDED", async () => {
       const proposal = await councilContract.getProposalById(proposalId)
 
       await mineUpTo(await councilContract.proposalSnapshot(proposalId))
 
-      await councilContract.connect(member1).castVote(proposalId, 1)
-      await councilContract.connect(member2).castVote(proposalId, 1)
+      await expect(councilContract.connect(member1).castVote(proposalId, 1)) // For
+        .to.emit(councilContract, 'VoteCast')
+        .withArgs(member1.address, proposalId, 1, 1, '')
+      await expect(councilContract.connect(member2).castVote(proposalId, 1)) // For
+        .to.emit(councilContract, 'VoteCast')
 
-      await mineUpTo((await councilContract.proposalDeadline(proposalId)).add(2))
+      await mineUpTo((await councilContract.proposalDeadline(proposalId)).add(1))
 
-      console.log(await councilContract.state(proposalId))
+      expect(await councilContract.state(proposalId)).to.equal(10) // Succeeded
+    })
+    it("should accept, count votes, and mark proposal FAILED", async () => {
+      const proposal = await councilContract.getProposalById(proposalId)
+
+      await mineUpTo(await councilContract.proposalSnapshot(proposalId))
+
+      await expect(councilContract.connect(member1).castVote(proposalId, 0)) // For
+        .to.emit(councilContract, 'VoteCast')
+        .withArgs(member1.address, proposalId, 0, 1, '')
+      await expect(councilContract.connect(member2).castVote(proposalId, 0)) // For
+        .to.emit(councilContract, 'VoteCast')
+
+      await mineUpTo((await councilContract.proposalDeadline(proposalId)).add(1))
+
+      expect(await councilContract.state(proposalId)).to.equal(9) // Succeeded
     })
   })
 });

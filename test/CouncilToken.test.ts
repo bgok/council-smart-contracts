@@ -14,14 +14,14 @@ describe("Token", () => {
     const councilContract = await upgrades.deployProxy(Council, [tokenContract.address]);
     await councilContract.deployed()
 
-    await tokenContract.initialize(councilContract.address);
+    await tokenContract.initialize(councilContract.address, 50);
 
     return { deployer, sender, receiver, tokenContract, councilContract };
   }
   describe("Mint", async () => {
     it("Should mint some tokens", async () => {
       const { tokenContract, councilContract } = await loadFixture(deployContracts);
-      expect(await tokenContract.totalSupply()).to.eq(1_000_000);
+      expect(await tokenContract.totalSupply()).to.eq(50);
       expect(await tokenContract.balanceOf(councilContract.address))
     });
   });

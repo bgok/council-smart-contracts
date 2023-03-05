@@ -18,17 +18,17 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
     function __IGovernor_init_unchained() internal onlyInitializing {
     }
     enum ProposalState {
-        Unset,
-        SecondRequired,
-        InDiscussion,
-        AmendmentPending,
-        MoveToVotePending,
-        DiscussionSuspended,
-        Pending,
-        Active,
-        Canceled,
-        Defeated,
-        Succeeded,
+        Unset, //0
+        SecondRequired, //1
+        InDiscussion, //2
+        AmendmentPending, //3
+        MoveToVotePending, //4
+        DiscussionSuspended, //5
+        Pending, //6
+        Active, //7
+        Canceled, //8
+        Defeated, //9
+        Succeeded, //10
         Queued,
         Expired,
         Executed
@@ -80,6 +80,11 @@ abstract contract IGovernorUpgradeable is Initializable, IERC165Upgradeable {
         uint256 weight,
         string reason,
         bytes params
+    );
+
+    event AmendmentAccepted(
+        uint256 amendmentId,
+        uint256 proposalId
     );
 
     /**

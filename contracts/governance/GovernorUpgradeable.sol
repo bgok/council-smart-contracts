@@ -16,7 +16,7 @@ import "@openzeppelin/contracts-upgradeable/utils/TimersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./IGovernorUpgradeable.sol";
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 /**
  * @dev Core of the governance system, designed to be extended though various modules.
@@ -198,6 +198,8 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
             return ProposalState.Active;
         }
 
+//        console.log(_quorumReached(proposalId));
+//        console.log(_voteSucceeded(proposalId));
         if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             return ProposalState.Succeeded;
         } else {
@@ -569,6 +571,7 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         require(state(proposalId) == ProposalState.Active, "Governor: vote not currently active");
 
         uint256 weight = _getVotes(account, proposal.voteStart.getDeadline(), params);
+//        console.log('weight:', weight);
         _countVote(proposalId, account, support, weight, params);
 
         if (params.length == 0) {

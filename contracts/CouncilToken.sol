@@ -11,10 +11,10 @@ contract CouncilToken is ERC20, ERC20Permit, ERC20Votes {
 
     constructor() ERC20("CouncilToken", "CTK") ERC20Permit("CouncilToken") {}
 
-    function initialize(Council councilContract) public {
+    function initialize(Council councilContract, uint256 votingTokensToMint) public {
         require(_initialized == false);
         _initialized = true;
-        _mint(address(councilContract), 1_000_000);
+        _mint(address(councilContract), votingTokensToMint);
     }
 
     function decimals() public view virtual override returns (uint8) {
