@@ -330,6 +330,17 @@ abstract contract GovernorUpgradeable is Initializable, ContextUpgradeable, ERC1
         uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState status = state(proposalId);
+        uint256 parent = _proposals[proposalId].parent;
+        if (parent != 0) {
+            // Special handling for amendments
+            if (status == ProposalState.Succeeded || status == ProposalState.Queued || status == ProposalState.Defeated) {
+                _proposals[parent].state = ProposalState.InDiscussion;
+            }
+            _proposals[proposalId].executed = true;
+            emit AmendmentAccepted(proposalId, parent);
+
+            return proposalId;
+        }
         require(
             status == ProposalState.Succeeded || status == ProposalState.Queued,
             "Governor: proposal not successful"

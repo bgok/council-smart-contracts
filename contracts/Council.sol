@@ -101,7 +101,7 @@ contract Council is
 
     function secondProposal(uint256 proposalId) onlyVoter public {
         // TODO the proposer should not be able to second the proposal
-        ProposalCore memory proposal = getProposalById(proposalId);
+        ProposalCore storage proposal = _proposals[proposalId];
 
         require(proposal.state == ProposalState.SecondRequired || proposal.state == ProposalState.MoveToVotePending);
 
@@ -109,6 +109,7 @@ contract Council is
             _setState(proposalId, ProposalState.InDiscussion);
         } else if (proposal.state == ProposalState.MoveToVotePending) {
             _setState(proposalId, ProposalState.Active);
+            GovernorUpgradeable._postProposalAction(proposal);
         }
         emit ProposalSeconded(proposalId, _msgSender());
     }

@@ -1,6 +1,6 @@
 import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
-import { loadFixture, mine } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, mine, mineUpTo } from "@nomicfoundation/hardhat-network-helpers";
 import snapshotGasCost from "@uniswap/snapshot-gas-cost";
 import { keccak256 } from "hardhat/internal/util/keccak";
 import { utils } from "ethers";
@@ -229,15 +229,51 @@ describe("Token", () => {
         .to.emit(councilContract, "MoveToVoteRequested")
         .withArgs(proposalId, member2.address)
 
-      let proposalState = (await councilContract.getProposalById(proposalId)).state;
-      expect(proposalState).to.equal(4); // state should be MoveToVotePending
+      let proposal = await councilContract.getProposalById(proposalId);
+      expect(proposal.state).to.equal(4); // state should be MoveToVotePending
+      expect(await councilContract.proposalSnapshot(proposalId)).to.equal(0);
+      expect(await councilContract.proposalDeadline(proposalId)).to.equal(0);
 
       await expect(councilContract.connect(member1).secondProposal(proposalId))
         .to.emit(councilContract, "ProposalSeconded")
         .withArgs(proposalId, member1.address)
 
-      proposalState = (await councilContract.getProposalById(proposalId)).state;
-      expect(proposalState).to.equal(7); // state should be Active
+      proposal = await councilContract.getProposalById(proposalId);
+      expect(proposal.state).to.equal(7); // state should be Active
+      expect(await councilContract.proposalSnapshot(proposalId)).to.not.equal(0);
+      expect(await councilContract.proposalDeadline(proposalId)).to.not.equal(0);
+    })
+  })
+  xdescribe("vote on proposal", async () => {
+    let proposalId:any, member1:any, member2:any, nonMember:any, tokenContract:any, councilContract:any
+    beforeEach(async () => {
+      const result  = await loadFixture(deployContracts);
+      member1 = result.member1
+      member2 = result.member2
+      nonMember = result.nonMember
+      tokenContract =result.tokenContract
+      councilContract = result.councilContract
+
+      const proposalText = 'pump up the volume'
+      const cid = '1337'
+      proposalId = await councilContract.hashProposal([], [], [], keccak256(Buffer.from(proposalText)))
+
+      await councilContract.connect(member1).propose([], [], [], proposalText, cid)
+      await councilContract.connect(member2).secondProposal(proposalId)
+      await councilContract.connect(member2).moveToVote(proposalId)
+      await councilContract.connect(member1).secondProposal(proposalId)
+    })
+    it("should accept and count votes", async () => {
+      const proposal = await councilContract.getProposalById(proposalId)
+
+      await mineUpTo(await councilContract.proposalSnapshot(proposalId))
+
+      await councilContract.connect(member1).castVote(proposalId, 1)
+      await councilContract.connect(member2).castVote(proposalId, 1)
+
+      await mineUpTo((await councilContract.proposalDeadline(proposalId)).add(2))
+
+      console.log(await councilContract.state(proposalId))
     })
   })
 });
